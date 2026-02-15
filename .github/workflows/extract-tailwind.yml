@@ -1,4 +1,4 @@
-name: Extract Tailwind CSS from CDN by VolkanSah
+name: Extract Tailwind CSS from CDN (by VolkanSah) ESOL_1.1
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install --save-dev tailwindcss @fullhuman/postcss-purgecss postcss
+        run: npm install --save-dev tailwindcss@^3 postcss autoprefixer
 
       - name: Extract used Tailwind classes from all HTML files
         run: node .github/scripts/extract-tailwind.js
