@@ -1,4 +1,4 @@
-name: Extract Tailwind CSS from CDN (by VolkanSah) ESOL_1.1
+name: Extract Tailwind CSS from CDN (by VolkanSah @ESOL-.1.1
 
 on:
   push:
