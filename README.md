@@ -1,3 +1,4 @@
+```
 tailwindcss-extractor/
 ├── .github/
 │   ├── workflows/
@@ -10,3 +11,4 @@ tailwindcss-extractor/
 │   └── tailwind.css               ← auto-gen
 ├── package.json
 └── .gitignore
+```
