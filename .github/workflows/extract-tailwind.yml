@@ -1,4 +1,4 @@
-name: Extract Tailwind CSS from CDN ESOL
+name: Extract Tailwind CSS from CDN - ESOL
 
 on:
   push:
@@ -34,6 +34,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git add assets/tailwind.css
-          git diff --staged --quiet || git commit -m "chore: update extracted tailwind.css [skip ci]"
           git pull --rebase origin main
+          git add assets/tailwind.css
+          git diff --staged --quiet || git commit -m "chore: update extracted tailwind.css [skip ci]"
           git push
