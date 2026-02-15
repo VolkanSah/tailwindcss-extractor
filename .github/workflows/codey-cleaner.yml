@@ -1,4 +1,4 @@
-name: Cleanup old Workflow Runs with Codey
+name: Cleanup old Workflow Runs
 
 on:
   workflow_dispatch:
@@ -33,6 +33,7 @@ permissions:
 jobs:
   cleanup:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Delete workflow runs
         uses: actions/github-script@v7
@@ -45,13 +46,14 @@ jobs:
             const cutoff       = new Date(Date.now() - days * 864e5);
             const owner        = context.repo.owner;
             const repo         = context.repo.repo;
+            const MAX_DELETES  = 200;
 
             console.log('─'.repeat(60));
-            console.log(`Repo          : ${owner}/${repo}`);
-            console.log(`Older than    : ${days} days (before ${cutoff.toISOString()})`);
-            console.log(`Keep minimum  : ${keepMin} per workflow`);
-            console.log(`Status filter : ${statusFilter}`);
-            console.log(`Workflow name : ${wfFilter || '(all)'}`);
+            console.log('Repo          : ' + owner + '/' + repo);
+            console.log('Older than    : ' + days + ' days (before ' + cutoff.toISOString() + ')');
+            console.log('Keep minimum  : ' + keepMin + ' per workflow');
+            console.log('Status filter : ' + statusFilter);
+            console.log('Workflow name : ' + (wfFilter || '(all)'));
             console.log('─'.repeat(60));
 
             const allWorkflows = await github.paginate(
@@ -72,36 +74,47 @@ jobs:
             let totalSkipped = 0;
 
             for (const wf of workflows) {
-              const runs = await github.paginate(
-                github.rest.actions.listWorkflowRuns,
-                { owner, repo, workflow_id: wf.id, per_page: 100 }
-              );
+              let page      = 1;
+              let deleted   = 0;
+              let skipped   = 0;
+              let keepCount = 0;
 
-              const sorted     = runs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-              const candidates = sorted.slice(keepMin);
+              while (true) {
+                const { data } = await github.rest.actions.listWorkflowRuns({
+                  owner, repo, workflow_id: wf.id, per_page: 50, page
+                });
 
-              const toDelete = candidates.filter(r => {
-                const oldEnough   = new Date(r.created_at) < cutoff;
-                const statusMatch = statusFilter === 'all' || r.conclusion === statusFilter;
-                return oldEnough && statusMatch;
-              });
+                if (data.workflow_runs.length === 0) break;
+                if (totalDeleted >= MAX_DELETES) break;
 
-              const skipped = candidates.length - toDelete.length;
-              totalSkipped += skipped;
+                for (const run of data.workflow_runs) {
+                  if (keepCount < keepMin) { keepCount++; skipped++; continue; }
 
-              for (const run of toDelete) {
-                try {
-                  await github.rest.actions.deleteWorkflowRun({ owner, repo, run_id: run.id });
-                  totalDeleted++;
-                } catch (e) {
-                  console.log(`  [SKIP] run ${run.id} — ${e.message}`);
+                  const oldEnough   = new Date(run.created_at) < cutoff;
+                  const statusMatch = statusFilter === 'all' || run.conclusion === statusFilter;
+
+                  if (oldEnough && statusMatch && totalDeleted < MAX_DELETES) {
+                    try {
+                      await github.rest.actions.deleteWorkflowRun({ owner, repo, run_id: run.id });
+                      deleted++;
+                      totalDeleted++;
+                      await new Promise(r => setTimeout(r, 100));
+                    } catch (e) {
+                      console.log('  [SKIP] run ' + run.id + ' - ' + e.message);
+                      skipped++;
+                    }
+                  } else {
+                    skipped++;
+                  }
                 }
+                page++;
               }
 
-              console.log(`[${wf.name}]  found ${runs.length} | deleted ${toDelete.length} | skipped ${skipped}`);
+              totalSkipped += skipped;
+              console.log('[' + wf.name + ']  deleted ' + deleted + ' | skipped ' + skipped);
             }
 
             console.log('─'.repeat(60));
-            console.log(`Total deleted : ${totalDeleted}`);
-            console.log(`Total skipped : ${totalSkipped}`);
-            console.log('Done ✓');
+            console.log('Total deleted : ' + totalDeleted);
+            console.log('Total skipped : ' + totalSkipped);
+            console.log('Done!');
