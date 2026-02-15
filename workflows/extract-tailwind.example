@@ -1,0 +1,34 @@
+name: Extract Tailwind CSS from CDN by VolkanSah
+
+on:
+  push:
+    paths:
+      - 'docs/**/*.html'
+  workflow_dispatch:
+
+jobs:
+  extract-tailwind:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install --save-dev tailwindcss @fullhuman/postcss-purgecss postcss
+
+      - name: Extract used Tailwind classes from all HTML files
+        run: node .github/scripts/extract-tailwind.js
+
+      - name: Commit extracted CSS
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/tailwind.css
+          git diff --staged --quiet || git commit -m "chore: update extracted tailwind.css [skip ci]"
+          git push
