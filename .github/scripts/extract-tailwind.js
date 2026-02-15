@@ -4,7 +4,7 @@
  * extract-tailwind.js by VolkanSah@github
  *
  * 1. Scans all .html files in /docs
- * 2. Extracts tailwind.config = {...} from HTML script tags
+ * 2. Extracts tailwind.config = {...} via bracket-matching (handles nested objects)
  * 3. Builds purged CSS via Tailwind CLI with the real config
  * 4. Writes result to /assets/tailwind.css
  */
@@ -42,27 +42,69 @@ function detectTailwindVersion(htmlFiles) {
 }
 
 /**
- * Extract the theme.extend block from tailwind.config in HTML.
- * Evaluates the config safely in a sandbox and returns the theme object.
+ * Extract the full tailwind.config = { ... } block using bracket counting.
+ * Handles deeply nested objects like keyframes without regex depth issues.
  */
-function extractThemeExtend(htmlFiles) {
+function extractConfigBlock(htmlFiles) {
   for (const f of htmlFiles) {
     const content = fs.readFileSync(f, 'utf8');
-    const match = content.match(/tailwind\.config\s*=\s*(\{[\s\S]+?\n\s*\})\s*\n/);
-    if (!match) continue;
 
+    // Find start position of the config object
+    const startMarker = 'tailwind.config';
+    const markerIdx = content.indexOf(startMarker);
+    if (markerIdx === -1) continue;
+
+    // Find the opening { after tailwind.config =
+    const openIdx = content.indexOf('{', markerIdx);
+    if (openIdx === -1) continue;
+
+    // Walk forward counting brackets until balanced
+    let depth = 0;
+    let closeIdx = -1;
+    let inString = false;
+    let strChar = '';
+
+    for (let i = openIdx; i < content.length; i++) {
+      const ch = content[i];
+
+      // Track strings to ignore brackets inside them
+      if (!inString && (ch === '"' || ch === "'" || ch === '`')) {
+        inString = true;
+        strChar = ch;
+        continue;
+      }
+      if (inString) {
+        if (ch === '\\') { i++; continue; } // escaped char
+        if (ch === strChar) inString = false;
+        continue;
+      }
+
+      if (ch === '{') depth++;
+      else if (ch === '}') {
+        depth--;
+        if (depth === 0) { closeIdx = i; break; }
+      }
+    }
+
+    if (closeIdx === -1) {
+      console.log('[WARN] Could not find end of tailwind.config block');
+      continue;
+    }
+
+    const rawBlock = content.slice(openIdx, closeIdx + 1);
+    console.log(`[INFO] Extracted tailwind.config block (${rawBlock.length} chars) from: ${path.relative(process.cwd(), f)}`);
+
+    // Eval the block safely
     try {
-      // Eval the config object in a safe sandbox
-      const configFn = new Function(`return ${match[1]}`);
-      const config = configFn();
+      const config = new Function(`return ${rawBlock}`)();
       if (config && config.theme) {
-        console.log(`[INFO] Extracted theme config from: ${path.relative(process.cwd(), f)}`);
-        return JSON.stringify(config.theme, null, 8);
+        return JSON.stringify(config.theme, null, 6);
       }
     } catch (e) {
-      console.log(`[WARN] Could not parse tailwind.config: ${e.message}`);
+      console.log(`[WARN] Could not eval tailwind.config: ${e.message}`);
     }
   }
+
   console.log('[WARN] No tailwind.config theme found — using default');
   return null;
 }
@@ -83,7 +125,7 @@ function run(cmd, opts = {}) {
   const version = detectTailwindVersion(htmlFiles);
   console.log(`[INFO] Tailwind version detected: v${version}`);
 
-  const themeJson = extractThemeExtend(htmlFiles);
+  const themeJson = extractConfigBlock(htmlFiles);
 
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'tw-extract-'));
   console.log(`[INFO] Working in: ${tmp}`);
@@ -96,7 +138,6 @@ function run(cmd, opts = {}) {
     run(`npx @tailwindcss/cli -i /dev/null -o "${OUT_FILE}" --content "${contentGlob}" --minify`, { cwd: process.cwd() });
 
   } else {
-    // Build valid tailwind.config.js with extracted theme
     const themeBlock = themeJson
       ? `theme: ${themeJson},`
       : `theme: { extend: {} },`;
@@ -112,7 +153,6 @@ module.exports = {
 };
 `;
 
-    // Debug: print config for inspection
     console.log('[INFO] Generated tailwind.config.js:');
     console.log(configContent);
 
