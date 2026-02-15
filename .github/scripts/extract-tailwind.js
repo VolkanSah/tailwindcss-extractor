@@ -1,27 +1,23 @@
 #!/usr/bin/env node
 
 /**
- * extract-tailwind.js by VolkanSah@Github
+ * extract-tailwind.js by VolkanSah@github
  *
  * 1. Scans all .html files in /docs
- * 2. Grabs the Tailwind CDN build (play CDN = full v3 CSS)
- * 3. Runs PurgeCSS against the actual HTML → only keeps used classes
- * 4. Writes the result to /assets/tailwind.css
+ * 2. Auto-detects Tailwind version from script tags in the HTML
+ * 3. Builds a purged CSS via Tailwind CLI (no CDN download needed)
+ * 4. Writes result to /assets/tailwind.css
  */
 
-const fs      = require('fs');
-const path    = require('path');
-const https   = require('https');
-const { PurgeCSS } = require('@fullhuman/postcss-purgecss');
+const fs            = require('fs');
+const path          = require('path');
+const os            = require('os');
+const { execSync }  = require('child_process');
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const DOCS_DIR   = path.resolve(process.cwd(), 'docs');
 const ASSETS_DIR = path.resolve(process.cwd(), 'assets');
 const OUT_FILE   = path.join(ASSETS_DIR, 'tailwind.css');
-
-// Tailwind v3 full CDN build (the same one the play CDN serves)
-const TAILWIND_CDN_URL =
-  'https://cdn.jsdelivr.net/npm/tailwindcss@3/dist/tailwind.min.css';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -34,31 +30,36 @@ function collectHtml(dir) {
   }
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      results.push(...collectHtml(full));
-    } else if (entry.name.endsWith('.html')) {
-      results.push(full);
-    }
+    if (entry.isDirectory())            results.push(...collectHtml(full));
+    else if (entry.name.endsWith('.html')) results.push(full);
   }
   return results;
 }
 
-/** Download a URL to a string */
-function download(url) {
-  return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
-      if (res.statusCode === 301 || res.statusCode === 302) {
-        return download(res.headers.location).then(resolve).catch(reject);
-      }
-      if (res.statusCode !== 200) {
-        return reject(new Error(`HTTP ${res.statusCode} for ${url}`));
-      }
-      const chunks = [];
-      res.on('data', (c) => chunks.push(c));
-      res.on('end',  () => resolve(Buffer.concat(chunks).toString('utf8')));
-      res.on('error', reject);
-    }).on('error', reject);
-  });
+/**
+ * Detect Tailwind major version by checking script tags in all HTML files.
+ * Falls back to v3 if nothing found.
+ */
+function detectTailwindVersion(htmlFiles) {
+  for (const f of htmlFiles) {
+    const content = fs.readFileSync(f, 'utf8');
+    // v4: @import "tailwindcss" or cdn.tailwindcss.com/4
+    if (/cdn\.tailwindcss\.com\/4|tailwindcss@4|@import\s+['"]tailwindcss['"]/i.test(content)) {
+      return 4;
+    }
+    // v3: cdn.tailwindcss.com (no version) or tailwindcss@3
+    if (/cdn\.tailwindcss\.com|tailwindcss@3/i.test(content)) {
+      return 3;
+    }
+  }
+  console.log('[INFO] No Tailwind CDN tag detected — defaulting to v3');
+  return 3;
+}
+
+/** Run a shell command, pipe output, throw on error */
+function run(cmd, opts = {}) {
+  console.log(`[RUN]  ${cmd}`);
+  execSync(cmd, { stdio: 'inherit', ...opts });
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -73,35 +74,66 @@ function download(url) {
   console.log(`[INFO] Found ${htmlFiles.length} HTML file(s):`);
   htmlFiles.forEach((f) => console.log('       •', path.relative(process.cwd(), f)));
 
-  // 2. Download full Tailwind CSS from CDN
-  console.log(`[INFO] Downloading Tailwind CSS from CDN…`);
-  const rawCss = await download(TAILWIND_CDN_URL);
-  console.log(`[INFO] Downloaded ${(rawCss.length / 1024).toFixed(1)} KB`);
+  // 2. Detect version
+  const version = detectTailwindVersion(htmlFiles);
+  console.log(`[INFO] Tailwind version detected: v${version}`);
 
-  // 3. PurgeCSS — keep only classes actually present in the HTML
-  console.log('[INFO] Running PurgeCSS…');
-  const purgeCss = new PurgeCSS();
-  const [result] = await purgeCss.purge({
-    content: htmlFiles.map((f) => ({ raw: fs.readFileSync(f, 'utf8'), extension: 'html' })),
-    css:     [{ raw: rawCss }],
-    // Safelist anything that starts with common dynamic prefixes
-    safelist: {
-      standard: [],
-      deep:     [],
-      greedy:   [/^(hover|focus|active|dark|sm|md|lg|xl|2xl):/],
-    },
-    // Tailwind-aware extractor: handles : / [ ] . chars in class names
-    defaultExtractor: (content) =>
-      content.match(/[^<>"'`\s]*[^<>"'`\s:]/g) || [],
-  });
+  // 3. Work in a temp dir so we don't pollute the repo
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'tw-extract-'));
+  console.log(`[INFO] Working in: ${tmp}`);
 
-  const purgedSize = (result.css.length / 1024).toFixed(1);
-  const savedPct   = (100 - (result.css.length / rawCss.length) * 100).toFixed(0);
-  console.log(`[INFO] Purged CSS: ${purgedSize} KB (saved ~${savedPct}%)`);
+  if (version === 4) {
+    // ── Tailwind v4 ──────────────────────────────────────────────────────────
+    // v4 uses a standalone CLI binary (@tailwindcss/cli) — no config needed
+    run(`npm install --save-dev @tailwindcss/cli@^4`, { cwd: process.cwd() });
 
-  // 4. Write output
-  fs.mkdirSync(ASSETS_DIR, { recursive: true });
-  const header = `/*\n * tailwind.css — auto-generated by extract-tailwind.js\n * Source: ${TAILWIND_CDN_URL}\n * Generated: ${new Date().toISOString()}\n * Files scanned: ${htmlFiles.length}\n */\n\n`;
-  fs.writeFileSync(OUT_FILE, header + result.css, 'utf8');
-  console.log(`[OK]   Written to: ${path.relative(process.cwd(), OUT_FILE)}`);
+    // Build with glob pointing at docs/**/*.html
+    const contentGlob = path.join(DOCS_DIR, '**', '*.html');
+    run(
+      `npx @tailwindcss/cli -i /dev/null -o "${OUT_FILE}" --content "${contentGlob}" --minify`,
+      { cwd: process.cwd() }
+    );
+
+  } else {
+    // ── Tailwind v3 ──────────────────────────────────────────────────────────
+    // v3 needs a config file that tells it where the content is
+
+    // Write minimal tailwind.config.js into tmp
+    const contentPaths = htmlFiles.map((f) => JSON.stringify(f)).join(',\n    ');
+    fs.writeFileSync(
+      path.join(tmp, 'tailwind.config.js'),
+      `/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    ${contentPaths}
+  ],
+  theme: { extend: {} },
+  plugins: [],
+};\n`
+    );
+
+    // Write minimal input CSS into tmp
+    fs.writeFileSync(
+      path.join(tmp, 'input.css'),
+      `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`
+    );
+
+    // Install tailwindcss v3 locally if not already present
+    const twBin = path.resolve(process.cwd(), 'node_modules', '.bin', 'tailwindcss');
+    if (!fs.existsSync(twBin)) {
+      run(`npm install --save-dev tailwindcss@^3 postcss autoprefixer`, { cwd: process.cwd() });
+    }
+
+    // Build
+    fs.mkdirSync(ASSETS_DIR, { recursive: true });
+    run(
+      `"${twBin}" -c "${path.join(tmp, 'tailwind.config.js')}" -i "${path.join(tmp, 'input.css')}" -o "${OUT_FILE}" --minify`
+    );
+  }
+
+  // 4. Report
+  const size = (fs.statSync(OUT_FILE).size / 1024).toFixed(1);
+  console.log(`[OK]   Written ${size} KB → ${path.relative(process.cwd(), OUT_FILE)}`);
+  console.log(`[OK]   Replace your CDN <script> with:`);
+  console.log(`       <link rel="stylesheet" href="/assets/tailwind.css">`);
 })();
