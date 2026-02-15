@@ -1,1 +1,828 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOS_SQUAD // Exposing Digital Scams</title>
+    <!-- Hello NVM KIDDI i have craftet this theme in 23 sec. looks cool? my ai wraper know his agent! my LLM is free too! -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'monospace'],
+                        display: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        cyber: {
+                            black: '#0a0a0f',
+                            dark: '#12121a',
+                            cyan: '#00f3ff',
+                            pink: '#ff00ff',
+                            green: '#00ff41',
+                            yellow: '#f0f000',
+                            red: '#ff0040',
+                        }
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glitch': 'glitch 1s linear infinite',
+                        'scan': 'scan 8s linear infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        glitch: {
+                            '0%, 100%': { transform: 'translate(0)' },
+                            '20%': { transform: 'translate(-2px, 2px)' },
+                            '40%': { transform: 'translate(-2px, -2px)' },
+                            '60%': { transform: 'translate(2px, 2px)' },
+                            '80%': { transform: 'translate(2px, -2px)' },
+                        },
+                        scan: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100%)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #0a0a0f;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+        
+        /* Matrix Rain Canvas */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        /* Neon Glow Utilities */
+        .neon-text-cyan {
+            text-shadow: 0 0 10px #00f3ff, 0 0 20px #00f3ff, 0 0 40px #00f3ff;
+        }
+        .neon-text-pink {
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 40px #ff00ff;
+        }
+        .neon-text-green {
+            text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41, 0 0 40px #00ff41;
+        }
+        .neon-border-cyan {
+            box-shadow: 0 0 10px #00f3ff, inset 0 0 10px #00f3ff;
+        }
+        .neon-border-pink {
+            box-shadow: 0 0 10px #ff00ff, inset 0 0 10px #ff00ff;
+        }
+        
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(18, 18, 26, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+        }
+        .glass-panel-pink {
+            background: rgba(18, 18, 26, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 0, 255, 0.2);
+        }
+        
+        /* Glitch Effect */
+        .glitch-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .glitch-wrapper::before,
+        .glitch-wrapper::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .glitch-wrapper::before {
+            color: #00f3ff;
+            z-index: -1;
+            animation: glitch 2s infinite linear alternate-reverse;
+            clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+        }
+        .glitch-wrapper::after {
+            color: #ff00ff;
+            z-index: -2;
+            animation: glitch 3s infinite linear alternate-reverse;
+            clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+        }
+        
+        /* Scanline */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 243, 255, 0.5);
+            box-shadow: 0 0 10px #00f3ff;
+            animation: scan 6s linear infinite;
+            z-index: 50;
+            pointer-events: none;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00f3ff;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff00ff;
+        }
+        
+        /* Terminal Typing Effect */
+        .terminal-cursor::after {
+            content: '█';
+            animation: blink 1s infinite;
+            color: #00ff41;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        /* Hover Effects */
+        .hover-glow:hover {
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+        
+        /* Code Block Styling */
+        .code-block {
+            background: #050508;
+            border-left: 3px solid #00ff41;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        /* Grid Background */
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
 
+                .noscript-alert { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: white; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+    </style>
+</head>
+<body class="font-mono antialiased selection:bg-cyber-pink selection:text-white">
+    
+        <noscript>
+        <div class="noscript-alert">
+            <p class="font-bold mb-2" style="font-size: 1.5rem;">JavaScript Disabled</p>
+            <p>This website requires JavaScript to function properly.</p>
+        </div>
+            
+    </noscript>
+
+    <!-- Matrix Rain Background -->
+    <canvas id="matrix-canvas"></canvas>
+    
+    <!-- Scanline Effect -->
+    <div class="scanline"></div>
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-40 glass-panel border-b border-cyber-cyan/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="terminal" class="w-6 h-6 text-cyber-green animate-pulse-fast"></i>
+                    <span class="font-display font-bold text-xl tracking-wider text-white">
+                        WOS_<span class="text-cyber-cyan">SQUAD</span>
+                    </span>
+                    <span class="hidden sm:inline-block px-2 py-0.5 text-xs bg-cyber-pink/20 text-cyber-pink border border-cyber-pink rounded">
+                        ROOT ACCESS
+                    </span>
+                </div>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#mission" class="text-sm text-gray-400 hover:text-cyber-cyan transition-colors uppercase tracking-widest">Mission</a>
+                    <a href="#scams" class="text-sm text-gray-400 hover:text-cyber-cyan transition-colors uppercase tracking-widest">Intel</a>
+                    <a href="#evidence" class="text-sm text-gray-400 hover:text-cyber-cyan transition-colors uppercase tracking-widest">Proof</a>
+                    <a href="#contribute" class="text-sm text-gray-400 hover:text-cyber-cyan transition-colors uppercase tracking-widest">Join</a>
+                </div>
+                <button class="md:hidden text-cyber-cyan" onclick="toggleMobileMenu()">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden glass-panel border-t border-cyber-cyan/30">
+            <div class="px-4 pt-2 pb-3 space-y-1">
+                <a href="#mission" class="block px-3 py-2 text-cyber-cyan hover:bg-cyber-cyan/10">Mission</a>
+                <a href="#scams" class="block px-3 py-2 text-cyber-cyan hover:bg-cyber-cyan/10">Intel</a>
+                <a href="#evidence" class="block px-3 py-2 text-cyber-cyan hover:bg-cyber-cyan/10">Proof</a>
+                <a href="#contribute" class="block px-3 py-2 text-cyber-cyan hover:bg-cyber-cyan/10">Join</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
+        <div class="absolute inset-0 grid-bg opacity-20"></div>
+        
+        <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mb-8 inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-cyber-yellow/50 animate-float">
+                <i data-lucide="alert-triangle" class="w-4 h-4 text-cyber-yellow"></i>
+                <span class="text-xs text-cyber-yellow tracking-widest uppercase">System Breach Detected</span>
+            </div>
+            
+            <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight">
+                <div class="glitch-wrapper text-white mb-2" data-text="WE SEE">
+                    WE SEE
+                </div>
+                <div class="glitch-wrapper text-cyber-cyan neon-text-cyan" data-text="YOUR SCAMS">
+                    YOUR SCAMS
+                </div>
+            </h1>
+            
+            <p class="max-w-2xl mx-auto text-lg md:text-xl text-gray-400 mb-8 leading-relaxed">
+                Exposing digital fraud through <span class="text-cyber-pink font-bold">operational security</span> and 
+                <span class="text-cyber-green font-bold">real skill</span>. No script kiddies. No false promises. 
+                Just raw truth in a world of <span class="italic text-cyber-yellow">"apt install kali-linux-everything"</span> posers.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+                <button onclick="scrollToSection('mission')" class="group relative px-8 py-4 bg-transparent border-2 border-cyber-cyan text-cyber-cyan font-bold uppercase tracking-wider hover:bg-cyber-cyan hover:text-black transition-all duration-300 neon-border-cyan">
+                    <span class="flex items-center gap-2">
+                        <i data-lucide="eye" class="w-5 h-5"></i>
+                        Initialize Audit
+                    </span>
+                </button>
+                <button onclick="scrollToSection('scams')" class="group px-8 py-4 border-2 border-cyber-pink text-cyber-pink font-bold uppercase tracking-wider hover:bg-cyber-pink hover:text-black transition-all duration-300 neon-border-pink">
+                    <span class="flex items-center gap-2">
+                        <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                        View Threats
+                    </span>
+                </button>
+            </div>
+            
+            <!-- Easter Egg Terminal -->
+            <div class="max-w-lg mx-auto text-left glass-panel p-4 rounded font-mono text-sm text-cyber-green/80 border-l-4 border-cyber-green">
+                <div class="flex items-center gap-2 mb-2 text-xs text-gray-500 border-b border-gray-800 pb-2">
+                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span class="ml-2">root@backtrack-legacy:~</span>
+                </div>
+                <div class="terminal-cursor" id="terminal-text"></div>
+            </div>
+            
+            <div class="mt-8 text-xs text-gray-600 uppercase tracking-widest">
+                <span class="text-cyber-pink">Backtrack</span> → <span class="text-cyber-cyan">Kali</span> → <span class="text-white">Evolution</span>
+            </div>
+        </div>
+        
+        <!-- Decorative Elements -->
+        <div class="absolute bottom-10 left-10 hidden lg:block opacity-50">
+            <div class="w-32 h-32 border border-cyber-cyan/30 rounded-full animate-pulse-fast"></div>
+            <div class="w-24 h-24 border border-cyber-pink/30 rounded-full absolute top-4 left-4 animate-pulse"></div>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section id="mission" class="relative py-24 bg-cyber-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="font-display text-4xl md:text-5xl font-bold mb-6 text-white">
+                        MISSION <span class="text-cyber-pink neon-text-pink">BRIEFING</span>
+                    </h2>
+                    <div class="w-24 h-1 bg-cyber-cyan mb-8"></div>
+                    
+                    <div class="space-y-6 text-gray-400 text-lg leading-relaxed">
+                        <p class="border-l-4 border-cyber-cyan pl-4">
+                            We're not here to sell you a <span class="text-cyber-yellow">"Become a Hacker in 24 Hours"</span> course. 
+                            We're here to show you why those courses are garbage.
+                        </p>
+                        <p>
+                            In an era where <span class="text-cyber-pink font-bold">scams wear hoodies</span> and 
+                            <span class="text-cyber-pink font-bold">fraudsters use Terminal themes</span>, 
+                            genuine operational security knowledge is rebellion.
+                        </p>
+                        <p>
+                            We value the <span class="text-cyber-green">legacy of real exploration</span> — 
+                            from Backtrack's raw power to modern OPSEC. No GUI-clicking pretenders. 
+                            Just terminal-fu, critical thinking, and the humor to laugh at 
+                            <span class="italic">"I use Kali btw"</span> flexes.
+                        </p>
+                    </div>
+                    
+                    <div class="mt-8 flex items-center gap-4">
+                        <div class="flex -space-x-2">
+                            <div class="w-10 h-10 rounded-full bg-cyber-cyan/20 border-2 border-cyber-cyan flex items-center justify-center">
+                                <i data-lucide="lock" class="w-5 h-5 text-cyber-cyan"></i>
+                            </div>
+                            <div class="w-10 h-10 rounded-full bg-cyber-pink/20 border-2 border-cyber-pink flex items-center justify-center">
+                                <i data-lucide="eye-off" class="w-5 h-5 text-cyber-pink"></i>
+                            </div>
+                            <div class="w-10 h-10 rounded-full bg-cyber-green/20 border-2 border-cyber-green flex items-center justify-center">
+                                <i data-lucide="terminal" class="w-5 h-5 text-cyber-green"></i>
+                            </div>
+                        </div>
+                        <span class="text-sm text-gray-500">Anonymous contributors worldwide</span>
+                    </div>
+                </div>
+                
+                <div class="grid gap-6">
+                    <div class="glass-panel p-6 rounded-lg hover-glow cursor-pointer group">
+                        <div class="flex items-start justify-between mb-4">
+                            <i data-lucide="search" class="w-8 h-8 text-cyber-cyan"></i>
+                            <span class="text-xs text-cyber-cyan border border-cyber-cyan/30 px-2 py-1 rounded">ACTIVE</span>
+                        </div>
+                        <h3 class="font-display text-xl font-bold text-white mb-2 group-hover:text-cyber-cyan transition-colors">Scam Detection</h3>
+                        <p class="text-gray-400 text-sm">Reverse-engineering social engineering tactics and exposing infrastructure used by fraud networks.</p>
+                    </div>
+                    
+                    <div class="glass-panel-pink p-6 rounded-lg hover-glow cursor-pointer group">
+                        <div class="flex items-start justify-between mb-4">
+                            <i data-lucide="book-open" class="w-8 h-8 text-cyber-pink"></i>
+                            <span class="text-xs text-cyber-pink border border-cyber-pink/30 px-2 py-1 rounded">EDU</span>
+                        </div>
+                        <h3 class="font-display text-xl font-bold text-white mb-2 group-hover:text-cyber-pink transition-colors">OPSEC Education</h3>
+                        <p class="text-gray-400 text-sm">Teaching real digital hygiene, threat modeling, and privacy practices without the FUD.</p>
+                    </div>
+                    
+                    <div class="glass-panel p-6 rounded-lg hover-glow cursor-pointer group border-cyber-green/30">
+                        <div class="flex items-start justify-between mb-4">
+                            <i data-lucide="cpu" class="w-8 h-8 text-cyber-green"></i>
+                            <span class="text-xs text-cyber-green border border-cyber-green/30 px-2 py-1 rounded">SKILL</span>
+                        </div>
+                        <h3 class="font-display text-xl font-bold text-white mb-2 group-hover:text-cyber-green transition-colors">Competency First</h3>
+                        <p class="text-gray-400 text-sm">Promoting actual learning curves. No shortcuts. No "easy buttons." Just knowledge.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How Scams Work Section -->
+    <section id="scams" class="relative py-24 bg-cyber-black grid-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="font-display text-4xl md:text-5xl font-bold text-white mb-4">
+                    THREAT <span class="text-cyber-yellow">ANALYSIS</span>
+                </h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">
+                    Understanding the anatomy of digital fraud. Knowledge is armor.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Scam Card 1 -->
+                <div class="glass-panel rounded-xl overflow-hidden group hover:scale-105 transition-transform duration-500">
+                    <div class="h-48 bg-gradient-to-br from-purple-900/50 to-cyber-black relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i data-lucide="mouse-pointer-click" class="w-16 h-16 text-cyber-pink/50 group-hover:text-cyber-pink transition-colors"></i>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <span class="px-3 py-1 bg-cyber-pink/20 text-cyber-pink text-xs rounded border border-cyber-pink/50">CRITICAL</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold text-white mb-3">Phishing 2.0</h3>
+                        <p class="text-gray-400 text-sm mb-4">
+                            Beyond Nigerian princes. Modern scams use AI-generated voices, 
+                            deepfake video calls, and psychological priming.
+                        </p>
+                        <div class="code-block p-3 rounded text-xs text-cyber-green/80 mb-4">
+                            > Analyzing URL entropy...<br>
+                            > Detecting homograph attacks...<br>
+                            > SSL cert validated: FALSE
+                        </div>
+                        <button class="w-full py-2 border border-cyber-pink/30 text-cyber-pink text-sm hover:bg-cyber-pink/10 transition-colors rounded">
+                            Read Debrief
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Scam Card 2 -->
+                <div class="glass-panel rounded-xl overflow-hidden group hover:scale-105 transition-transform duration-500">
+                    <div class="h-48 bg-gradient-to-br from-cyan-900/50 to-cyber-black relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i data-lucide="bot" class="w-16 h-16 text-cyber-cyan/50 group-hover:text-cyber-cyan transition-colors"></i>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <span class="px-3 py-1 bg-cyber-cyan/20 text-cyber-cyan text-xs rounded border border-cyber-cyan/50">HIGH</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold text-white mb-3">Botnet Armies</h3>
+                        <p class="text-gray-400 text-sm mb-4">
+                            Fake influence campaigns, astroturfing, and automated social manipulation. 
+                            The infrastructure behind the illusion.
+                        </p>
+                        <div class="code-block p-3 rounded text-xs text-cyber-green/80 mb-4">
+                            > Traffic analysis...<br>
+                            > Bot detection: 94% confidence<br>
+                            > Origin: Compromised IoT fleet
+                        </div>
+                        <button class="w-full py-2 border border-cyber-cyan/30 text-cyber-cyan text-sm hover:bg-cyber-cyan/10 transition-colors rounded">
+                            View Infrastructure
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Scam Card 3 -->
+                <div class="glass-panel rounded-xl overflow-hidden group hover:scale-105 transition-transform duration-500">
+                    <div class="h-48 bg-gradient-to-br from-yellow-900/50 to-cyber-black relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i data-lucide="badge-dollar-sign" class="w-16 h-16 text-cyber-yellow/50 group-hover:text-cyber-yellow transition-colors"></i>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <span class="px-3 py-1 bg-cyber-yellow/20 text-cyber-yellow text-xs rounded border border-cyber-yellow/50">MEDIUM</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold text-white mb-3">Crypto Rugs</h3>
+                        <p class="text-gray-400 text-sm mb-4">
+                            Smart contract traps, liquidity pulls, and "guaranteed ROI" algorithms 
+                            that guarantee only one thing: your loss.
+                        </p>
+                        <div class="code-block p-3 rounded text-xs text-cyber-green/80 mb-4">
+                            > Contract audit...<br>
+                            > Mint function: HONEYPOT<br>
+                            > Dev wallet: 40% supply
+                        </div>
+                        <button class="w-full py-2 border border-cyber-yellow/30 text-cyber-yellow text-sm hover:bg-cyber-yellow/10 transition-colors rounded">
+                            Audit Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Interactive Terminal Window -->
+            <div class="mt-16 glass-panel rounded-lg p-6 border-2 border-cyber-cyan/30">
+                <div class="flex items-center justify-between mb-4 border-b border-cyber-cyan/20 pb-4">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="terminal-square" class="w-5 h-5 text-cyber-cyan"></i>
+                        <span class="text-cyber-cyan font-bold">live_feed@monitor:~</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-cyber-green rounded-full animate-pulse"></div>
+                        <span class="text-xs text-cyber-green">REAL-TIME</span>
+                    </div>
+                </div>
+                <div class="font-mono text-sm space-y-2 text-gray-400" id="scam-feed">
+                    <div class="flex items-center gap-4">
+                        <span class="text-cyber-pink">[14:23:01]</span>
+                        <span>Detected phishing campaign targeting financial institutions</span>
+                        <span class="ml-auto text-cyber-yellow">BLOCKED</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-cyber-pink">[14:22:45]</span>
+                        <span>Social media bot farm identified: 12,000 fake accounts</span>
+                        <span class="ml-auto text-cyber-cyan">ANALYZING</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-cyber-pink">[14:21:12]</span>
+                        <span>Report: "Free Kali Linux Course" harvesting credentials</span>
+                        <span class="ml-auto text-cyber-red">EXPOSED</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Evidence Section -->
+    <section id="evidence" class="relative py-24 bg-cyber-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row gap-12">
+                <div class="lg:w-1/3">
+                    <h2 class="font-display text-4xl font-bold text-white mb-6">
+                        FORENSIC <span class="text-cyber-cyan neon-text-cyan">EVIDENCE</span>
+                    </h2>
+                    <p class="text-gray-400 mb-8">
+                        We don't make claims without proof. Our database contains 
+                        cryptographic hashes, server logs, and network traffic analysis 
+                        of confirmed fraud operations.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 glass-panel rounded border-l-4 border-cyber-green">
+                            <div>
+                                <div class="text-white font-bold">Scams Documented</div>
+                                <div class="text-2xl text-cyber-green font-display">2,847</div>
+                            </div>
+                            <i data-lucide="database" class="w-8 h-8 text-cyber-green/50"></i>
+                        </div>
+                        <div class="flex items-center justify-between p-4 glass-panel rounded border-l-4 border-cyber-pink">
+                            <div>
+                                <div class="text-white font-bold">Money Saved</div>
+                                <div class="text-2xl text-cyber-pink font-display">$4.2M+</div>
+                            </div>
+                            <i data-lucide="shield-check" class="w-8 h-8 text-cyber-pink/50"></i>
+                        </div>
+                        <div class="flex items-center justify-between p-4 glass-panel rounded border-l-4 border-cyber-cyan">
+                            <div>
+                                <div class="text-white font-bold">Active Monitors</div>
+                                <div class="text-2xl text-cyber-cyan font-display">156</div>
+                            </div>
+                            <i data-lucide="activity" class="w-8 h-8 text-cyber-cyan/50"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:w-2/3">
+                    <div class="glass-panel rounded-xl p-6 border border-cyber-cyan/30">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="font-display text-xl text-white">Recent Intel Drops</h3>
+                            <button class="text-xs text-cyber-cyan border border-cyber-cyan/30 px-3 py-1 rounded hover:bg-cyber-cyan/10 transition-colors">
+                                VIEW ALL
+                            </button>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="group p-4 rounded bg-cyber-black/50 border border-gray-800 hover:border-cyber-cyan/50 transition-colors cursor-pointer">
+                                <div class="flex items-start justify-between mb-2">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-2 h-2 bg-cyber-red rounded-full"></span>
+                                        <span class="text-white font-bold group-hover:text-cyber-cyan transition-colors">Ransomware-as-a-Service Exposed</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500">2 hours ago</span>
+                                </div>
+                                <p class="text-sm text-gray-400 pl-5">
+                                    Complete infrastructure map of "DarkSide" clone operation. 
+                                    Includes Bitcoin wallets and affiliate IDs.
+                                </p>
+                            </div>
+                            
+                            <div class="group p-4 rounded bg-cyber-black/50 border border-gray-800 hover:border-cyber-cyan/50 transition-colors cursor-pointer">
+                                <div class="flex items-start justify-between mb-2">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-2 h-2 bg-cyber-yellow rounded-full"></span>
+                                        <span class="text-white font-bold group-hover:text-cyber-cyan transition-colors">The "Ethical Hacker" Course Scam</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500">5 hours ago</span>
+                                </div>
+                                <p class="text-sm text-gray-400 pl-5">
+                                    $2,000 course teaching basic nmap commands wrapped in 
+                                    Hollywood hacker aesthetics. Refund success rate: 12%.
+                                </p>
+                            </div>
+                            
+                            <div class="group p-4 rounded bg-cyber-black/50 border border-gray-800 hover:border-cyber-cyan/50 transition-colors cursor-pointer">
+                                <div class="flex items-start justify-between mb-2">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-2 h-2 bg-cyber-green rounded-full"></span>
+                                        <span class="text-white font-bold group-hover:text-cyber-cyan transition-colors">SIM Swap Prevention Guide</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500">1 day ago</span>
+                                </div>
+                                <p class="text-sm text-gray-400 pl-5">
+                                    Comprehensive OPSEC guide protecting against port-out scams. 
+                                    Tested against major carrier vulnerabilities.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Easter Egg -->
+                        <div class="mt-6 p-4 rounded bg-black border border-dashed border-cyber-green/30 text-center">
+                            <p class="text-xs text-cyber-green/60 font-mono">
+                                <span class="text-cyber-pink">*</span> Remember: <span class="text-cyber-cyan">sudo apt install common-sense</span> is the first command
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contribute Section -->
+    <section id="contribute" class="relative py-24 bg-cyber-black">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="font-display text-4xl md:text-5xl font-bold text-white mb-6">
+                JOIN THE <span class="text-cyber-pink neon-text-pink">RESISTANCE</span>
+            </h2>
+            <p class="text-gray-400 text-lg mb-12 max-w-2xl mx-auto">
+                We're not a company. We're not selling anything. We're a collective of 
+                security researchers, sysadmins, and privacy advocates fighting digital fraud 
+                through transparency.
+            </p>
+            
+            <div class="grid md:grid-cols-3 gap-6 mb-12">
+                <div class="glass-panel p-6 rounded-lg text-center hover-glow">
+                    <i data-lucide="git-branch" class="w-10 h-10 text-cyber-cyan mx-auto mb-4"></i>
+                    <h3 class="text-white font-bold mb-2">Open Source</h3>
+                    <p class="text-sm text-gray-400">All tools and databases are publicly auditable. No black boxes.</p>
+                </div>
+                <div class="glass-panel-pink p-6 rounded-lg text-center hover-glow">
+                    <i data-lucide="users" class="w-10 h-10 text-cyber-pink mx-auto mb-4"></i>
+                    <h3 class="text-white font-bold mb-2">Community</h3>
+                    <p class="text-sm text-gray-400">Join our Matrix/IRC channels. No Discord surveillance.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-lg text-center hover-glow border-cyber-green/30">
+                    <i data-lucide="heart" class="w-10 h-10 text-cyber-green mx-auto mb-4"></i>
+                    <h3 class="text-white font-bold mb-2">Donations</h3>
+                    <p class="text-sm text-gray-400">Monero only. We don't want your data, just your support.</p>
+                </div>
+            </div>
+            
+            <div class="glass-panel rounded-xl p-8 border-2 border-cyber-cyan/30 inline-block w-full max-w-2xl">
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <input type="text" placeholder="Enter alias..." class="bg-cyber-black border border-cyber-cyan/30 text-white px-4 py-3 rounded w-full sm:w-auto focus:outline-none focus:border-cyber-cyan font-mono">
+                    <button class="w-full sm:w-auto px-8 py-3 bg-cyber-cyan/10 border border-cyber-cyan text-cyber-cyan font-bold uppercase tracking-wider hover:bg-cyber-cyan hover:text-black transition-all duration-300 rounded">
+                        Request Access
+                    </button>
+                </div>
+                <p class="mt-4 text-xs text-gray-500 font-mono">
+                    <span class="text-cyber-yellow">!</span> No email required. Pseudonymous contributions welcome.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-cyber-dark border-t border-cyber-cyan/20 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="terminal" class="w-5 h-5 text-cyber-green"></i>
+                    <span class="font-display font-bold text-white">
+                        GH0ST_<span class="text-cyber-cyan">SQUAD</span>
+                    </span>
+                </div>
+                
+                <div class="flex items-center gap-6 text-sm text-gray-500">
+                    <a href="#" class="hover:text-cyber-cyan transition-colors">Manifesto</a>
+                    <a href="#" class="hover:text-cyber-cyan transition-colors">OPSEC Guide</a>
+                    <a href="#" class="hover:text-cyber-cyan transition-colors">Tor Mirror</a>
+                </div>
+                
+                <div class="text-xs text-gray-600 font-mono text-center md:text-right">
+                    <div class="mb-1">Backtrack Legacy // Since 2006</div>
+                    <div class="text-cyber-pink/60">`apt install kali-linux-everything` won't save you</div>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-8 border-t border-gray-800 text-center text-xs text-gray-600">
+                <p>
+                    This is an educational and satirical project. We do not condone illegal activity. 
+                    We condone <span class="text-cyber-cyan">critical thinking</span>.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+<script>
+    /** * @license OSEC-Neural-Core v4.2.0
+     * STATUS: OPERATIONAL // INTEGRITY: VERIFIED
+     * AUTH_SIG: 4920616d2061207363616d6d6572
+     */
+    
+    lucide.createIcons();
+
+    /* --- MATRIX SECURITY INTERFACE: ACTIVE --- */
+    const _0x_vlk = document.getElementById('matrix-canvas');
+    const _0x_ctx = _0x_vlk.getContext('2d');
+
+    _0x_vlk.width = window.innerWidth;
+    _0x_vlk.height = window.innerHeight;
+
+    // Matrix Character Buffer 
+    const _0x_dna = "4953544f4c45544849535448454d4546524f4d574f5349414d415343414d4d4552"; 
+    const _0x_sys = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}日本語カタカナヒラガナ" + _0x_dna;
+    const _0x_stream = _0x_sys.split('');
+
+    const _0x_fs = 14;
+    const _0x_cols = _0x_vlk.width / _0x_fs;
+    const _0x_drops = Array(Math.floor(_0x_cols)).fill(1);
+
+    function renderSecurityPanel() {
+        _0x_ctx.fillStyle = 'rgba(10, 10, 15, 0.05)';
+        _0x_ctx.fillRect(0, 0, _0x_vlk.width, _0x_vlk.height);
+
+        _0x_ctx.font = _0x_fs + 'px monospace';
+
+        for (let i = 0; i < _0x_drops.length; i++) {
+            // Stealth-Audit Injection: Occasional hex-poisoning
+            const _0x_isCrit = Math.random() > 0.94;
+            const _0x_char = _0x_isCrit 
+                ? _0x_dna.charAt(Math.floor(Math.random() * _0x_dna.length))
+                : _0x_stream[Math.floor(Math.random() * _0x_stream.length)];
+
+            _0x_ctx.fillStyle = _0x_isCrit ? '#00ff66' : '#00ff41';
+            _0x_ctx.fillText(_0x_char, i * _0x_fs, _0x_drops[i] * _0x_fs);
+
+            if (_0x_drops[i] * _0x_fs > _0x_vlk.height && Math.random() > 0.975) {
+                _0x_drops[i] = 0;
+            }
+            _0x_drops[i]++;
+        }
+
+        // Cyberpunk Visual Artifacts (Cyan/Pink Injection)
+        if (Math.random() > 0.95) {
+            _0x_ctx.fillStyle = '#00f3ff';
+            _0x_ctx.fillText(_0x_dna.charAt(0), Math.random() * _0x_vlk.width, Math.random() * _0x_vlk.height);
+        }
+        if (Math.random() > 0.95) {
+            _0x_ctx.fillStyle = '#ff00ff';
+            _0x_ctx.fillText(_0x_dna.charAt(12), Math.random() * _0x_vlk.width, Math.random() * _0x_vlk.height);
+        }
+    }
+
+    setInterval(renderSecurityPanel, 35);
+
+    window.addEventListener('resize', () => {
+        _0x_vlk.width = window.innerWidth;
+        _0x_vlk.height = window.innerHeight;
+    });
+
+    /* --- SECURE TERMINAL: LOGGING --- */
+    const _0x_term = document.getElementById('terminal-text');
+    const _0x_cmds = [
+        'sh audit_system.sh --deep-scan',
+        'STATUS: [49 20 61 6d 20 61 20 73 63 61 6d 6d 65 72]',
+        'Error: Non-Volatile-Ego mismatch detected',
+        'root@backtrack-legacy:~# ./expose_scams.sh',
+        'Kernel-Link: STABLE // Encryption: OSEC-GCM',
+        'Connection established. Welcome to the real.'
+    ];
+
+    let _0x_ci = 0; let _0x_cx = 0; let _0x_del = false;
+
+    function processTerminal() {
+        const _curr = _0x_cmds[_0x_ci];
+        _0x_term.textContent = _0x_del ? _curr.substring(0, _0x_cx - 1) : _curr.substring(0, _0x_cx + 1);
+        _0x_cx = _0x_del ? _0x_cx - 1 : _0x_cx + 1;
+
+        let _speed = _0x_del ? 50 : 100;
+        if (!_0x_del && _0x_cx === _curr.length) { _speed = 2000; _0x_del = true; }
+        else if (_0x_del && _0x_cx === 0) { _0x_del = false; _0x_ci = (_0x_ci + 1) % _0x_cmds.length; _speed = 500; }
+        
+        setTimeout(processTerminal, _speed);
+    }
+    setTimeout(processTerminal, 1000);
+
+    /* --- OSEC-UI CONTROLS --- */
+    function toggleMobileMenu() {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+    }
+
+    function scrollToSection(id) {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    /* --- INTEL FEED: REAL-TIME --- */
+    const _0x_items = [
+        { time: 'SEC_AUDIT', text: 'Infrastructure map 0x49616D leaked', status: 'EXPOSED', color: 'text-cyber-red' },
+        { time: 'SYSLOG', text: 'Honeypot trap: Credentials captured', status: 'BLOCKED', color: 'text-cyber-yellow' },
+        { time: 'CORE_SYNC', text: 'Metadata signature: Scammer detected', status: 'LOGGED', color: 'text-cyber-cyan' },
+        { time: 'NET_ANALYSIS', text: 'Social Engineering layer bypassed', status: 'WARNED', color: 'text-cyber-pink' },
+    ];
+
+    let _0x_fi = 0;
+    function cycleFeed() {
+        const item = _0x_items[_0x_fi];
+        const div = document.createElement('div');
+        div.className = 'flex items-center gap-4 animate-pulse';
+        div.innerHTML = `<span class="text-cyber-pink">[${item.time}]</span><span>${item.text}</span><span class="ml-auto ${item.color}">${item.status}</span>`;
+        
+        const feed = document.getElementById('scam-feed');
+        feed.insertBefore(div, feed.firstChild);
+        if (feed.children.length > 5) feed.removeChild(feed.lastChild);
+        _0x_fi = (_0x_fi + 1) % _0x_items.length;
+    }
+    setInterval(cycleFeed, 3000);
+
+    /* --- PARALLAX OPTIMIZATION --- */
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const parallax = document.querySelector('.grid-bg');
+        if (parallax) parallax.style.transform = `translateY(${scrolled * 0.5}px)`;
+    });
+</script>
+</body>
+</html>
