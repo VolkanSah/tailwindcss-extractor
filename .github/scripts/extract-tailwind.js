@@ -16,9 +16,7 @@ const { execSync } = require('child_process');
 
 const DOCS_DIR   = path.resolve(process.cwd(), 'docs');
 const ASSETS_DIR = path.resolve(process.cwd(), 'assets');
-//const OUT_FILE   = path.join(ASSETS_DIR, 'tailwind.css');
-const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-const OUT_FILE = path.join(ASSETS_DIR, `tailwind-${timestamp}.css`);
+const OUT_FILE   = path.join(ASSETS_DIR, 'tailwind.css');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
