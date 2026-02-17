@@ -1,3 +1,5 @@
+Easy to use Put your htmls files in /docs folder. than start actions.
+
 ```
 tailwindcss-extractor/
 ├── .github/
