@@ -57,5 +57,9 @@ The source is fully transparent — read it before you run it.
 
 ## License
 
-[APACHE2](LICENSE) + [ESOL v1.1](ESOL) — Ethical use only.  
-*by [VolkanSah](https://github.com/VolkanSah)* | [Source](https://github.com/VolkanSah/tailwindcss-extractor)
+>This Work is dual-licensed under the [APACHE2](LICENSE) and the
+> Ethical Security Operations License [ESOL v1.1](ESOL).
+> The ESOL is a mandatory, non-severable condition of use.
+> By using this software, you agree to all ethical constraints defined in the ESOL v1.1.
+>
+> *by [VolkanSah](https://github.com/VolkanSah)* | [Source](https://github.com/VolkanSah/tailwindcss-extractor)
