@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dev Docs Template</title>
+    <title>Nemesis Cyber Force | Defensive Security Research</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -11,352 +11,234 @@
     <script src="https://unpkg.com/feather-icons"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        obsidian: {
-                            50: '#f8fafc',
-                            100: '#f1f5f9',
-                            200: '#e2e8f0',
-                            300: '#cbd5e1',
-                            400: '#94a3b8',
-                            500: '#64748b',
-                            600: '#475569',
-                            700: '#334155',
-                            800: '#1e293b',
-                            900: '#0f172a',
-                            950: '#020617',
-                        },
-                        primary: {
-                            light: '#3b82f6',
-                            dark: '#2563eb',
-                        }
+                        primary: '#1a1a2e',
+                        secondary: '#16213e',
+                        accent: '#0f3460',
+                        highlight: '#e94560',
                     }
                 }
             }
         }
     </script>
     <style>
-        pre {
-            background-color: #1e293b !important;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin: 1rem 0;
-            overflow-x: auto;
+        .max-content {
+            max-width: 80%;
+            margin: 0 auto;
         }
-        code {
-            background-color: #1e293b;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            color: #f8fafc;
+        .gradient-text {
+            background: linear-gradient(90deg, #e94560 0%, #0f3460 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
-        body {
-            scroll-behavior: smooth;
-        }
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #475569;
-            border-radius: 4px;
-        }
-        #noscript-alert {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .illustration {
             width: 100%;
-            background-color: #dc3545;
-            color: white;
-            text-align: center;
-            padding: 10px;
-            z-index: 1000;
+            height: 300px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .illustration::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: radial-gradient(circle, rgba(233,69,96,0.1) 0%, rgba(15,52,96,0) 70%);
+            animation: rotate 20s linear infinite;
+        }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .no-script-overlay {
+            display: none;
         }
     </style>
 </head>
-<body class="bg-obsidian-900 text-obsidian-100 min-h-screen font-mono">
-       <noscript>
-        <div id="noscript-alert">
-            <strong>WARNING:</strong> JavaScript is disabled. This website requires JavaScript to function properly.
-        </div>
+<body class="bg-primary text-gray-100 min-h-screen">
+    <noscript>
+        <style>
+            body > *:not(.no-script-overlay) {
+                display: none;
+            }
+            .no-script-overlay {
+                display: flex !important;
+            }
+        </style>
     </noscript>
-    <div id="main-content" class="hidden_main">
-      
-    <div class="flex flex-col min-h-screen">
-        <!-- Navigation -->
-        <nav class="bg-obsidian-800 border-b border-obsidian-700 sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <span class="text-primary-500 font-bold text-xl">{ }</span>
-                        </div>
-                        <div class="hidden md:block">
-                            <div class="ml-10 flex items-baseline space-x-4">
-                                <a href="#" class="bg-obsidian-700 text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
-                                <a href="#getting-started" class="text-obsidian-300 hover:bg-obsidian-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Getting Started</a>
-                                <a href="#api-reference" class="text-obsidian-300 hover:bg-obsidian-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">API Reference</a>
-                                <a href="#examples" class="text-obsidian-300 hover:bg-obsidian-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Examples</a>
-                                <a href="#faq" class="text-obsidian-300 hover:bg-obsidian-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">FAQ</a>
-                            </div>
+    <div class="no-script-overlay fixed inset-0 bg-black z-50 items-center justify-center p-8">
+        <div class="text-center max-w-2xl">
+            <h1 class="text-4xl font-bold text-highlight mb-4">JavaScript Required</h1>
+            <p class="text-xl mb-6">This website requires JavaScript to function properly. Please enable JavaScript in your browser settings to continue.</p>
+            <p class="text-sm opacity-75">Nemesis Cyber Force - Guardian of Digital Security</p>
+        </div>
+    </div>
+    <div id="app">
+        <nav class="bg-secondary py-4 sticky top-0 z-50 shadow-lg">
+            <div class="max-content flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i data-feather="shield" class="text-highlight"></i>
+                    <span class="text-xl font-bold gradient-text">NEMESIS CYBER FORCE</span>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#mission" class="hover:text-highlight transition hidden md:block">Mission</a>
+                    <a href="#about" class="hover:text-highlight transition hidden md:block">About</a>
+                    <a href="#values" class="hover:text-highlight transition hidden md:block">Values</a>
+                    <a href="https://github.com/NemesisCyberForce" target="_blank" class="hover:text-highlight transition" aria-label="GitHub Organization">
+                        <i data-feather="github" class="w-6 h-6"></i>
+                    </a>
+                </div>
+                <button class="md:hidden">
+                    <i data-feather="menu"></i>
+                </button>
+            </div>
+        </nav>
+        <section id="home" class="py-20">
+            <div class="max-content">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div data-aos="fade-right">
+                        <h1 class="text-5xl font-bold mb-6">GUARDIAN OF <span class="gradient-text">DIGITAL SECURITY</span></h1>
+                        <p class="text-lg mb-8 opacity-90">We publish **Blue Team & White Hat Repositories only**. In search of freedom and knowledge, standing against ignorance and apathy in the digital world.</p>
+                        <div class="flex space-x-4">
+                            <a href="https://github.com/NemesisCyberForce" target="_blank" class="bg-highlight hover:bg-opacity-90 text-white px-6 py-3 rounded-lg font-medium transition">Explore Projects</a>
+                            <a href="#about" class="border border-highlight text-highlight hover:bg-highlight hover:bg-opacity-10 px-6 py-3 rounded-lg font-medium transition">Learn More</a>
                         </div>
                     </div>
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <button id="theme-toggle" class="p-2 rounded-md text-obsidian-300 hover:text-white hover:bg-obsidian-700 focus:outline-none">
-                                <i data-feather="moon"></i>
-                            </button>
+                    <div data-aos="fade-left" class="illustration flex items-center justify-center">
+                        <div class="relative z-10 text-center p-8">
+                            <i data-feather="shield" class="w-16 h-16 mx-auto text-highlight mb-4"></i>
+                            <h3 class="text-2xl font-bold mb-2">Vengeance Technologie</h3>
+                            <p class="opacity-80">Retribution Security - Cyber Reprisal</p>
                         </div>
-                        <div class="ml-4 flex items-center md:ml-6">
-                            <a href="https://github.com/yourusername/yourrepo" target="_blank" class="p-2 rounded-md text-obsidian-300 hover:text-white hover:bg-obsidian-700 focus:outline-none">
-                                <i data-feather="github"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="mission" class="py-16 bg-secondary">
+            <div class="max-content">
+                <h2 class="text-3xl font-bold mb-12 text-center" data-aos="fade-up">OUR <span class="gradient-text">MISSION</span></h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-primary p-8 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="100">
+                        <i data-feather="eye" class="w-10 h-10 text-highlight mb-4"></i>
+                        <h3 class="text-xl font-bold mb-3">Identify Vulnerabilities</h3>
+                        <p class="opacity-80">Discovering and responsibly disclosing security flaws to protect systems before they can be exploited.</p>
+                    </div>
+                    <div class="bg-primary p-8 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="200">
+                        <i data-feather="lock" class="w-10 h-10 text-highlight mb-4"></i>
+                        <h3 class="text-xl font-bold mb-3">Strengthen Defenses</h3>
+                        <p class="opacity-80">Implementing robust security measures to safeguard against evolving digital threats.</p>
+                    </div>
+                    <div class="bg-primary p-8 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="300">
+                        <i data-feather="code" class="w-10 h-10 text-highlight mb-4"></i>
+                        <h3 class="text-xl font-bold mb-3">Ethical Automation</h3>
+                        <p class="opacity-80">Developing tools that automate protection without compromising ethical standards.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="about" class="py-20">
+            <div class="max-content">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div data-aos="fade-right" class="illustration flex items-center justify-center">
+                        <div class="relative z-10 text-center p-8">
+                            <i data-feather="globe" class="w-16 h-16 mx-auto text-highlight mb-4"></i>
+                            <h3 class="text-2xl font-bold mb-2">Digital Vigilance</h3>
+                            <p class="opacity-80">From Germany to the World</p>
+                        </div>
+                    </div>
+                    <div data-aos="fade-left">
+                        <h2 class="text-3xl font-bold mb-6">ABOUT <span class="gradient-text">NEMESIS CYBER FORCE</span></h2>
+                        <p class="mb-4 opacity-90">Founded by Volkan Sah, Nemesis Cyber Force is a collective of security professionals dedicated to making the digital world safer through knowledge and action.</p>
+                        <p class="mb-4 opacity-90">We believe security should be a fundamental concern for everyone, not just tech enthusiasts. Our community learns, collaborates, and builds tools that protect and empower.</p>
+                        <p class="mb-6 opacity-90">We envision a safer digital future where people are aware of risks and take proactive measures to secure their digital lives.</p>
+                        <div class="flex items-center space-x-4">
+                            <a href="https://github.com/NemesisCyberForce" target="_blank" class="hover:text-highlight transition">
+                                <i data-feather="github" class="w-6 h-6"></i>
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
-        </nav>
-
-        <!-- Mobile menu -->
-        <div class="md:hidden bg-obsidian-800 border-b border-obsidian-700" id="mobile-menu">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#" class="bg-obsidian-700 text-white block px-3 py-2 rounded-md text-base font-medium">Home</a>
-                <a href="#getting-started" class="text-obsidian-300 hover:bg-obsidian-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Getting Started</a>
-                <a href="#api-reference" class="text-obsidian-300 hover:bg-obsidian-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">API Reference</a>
-                <a href="#examples" class="text-obsidian-300 hover:bg-obsidian-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Examples</a>
-                <a href="#faq" class="text-obsidian-300 hover:bg-obsidian-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">FAQ</a>
+        </section>
+        <section id="values" class="py-16 bg-secondary">
+            <div class="max-content">
+                <h2 class="text-3xl font-bold mb-12 text-center" data-aos="fade-up">OUR <span class="gradient-text">VALUES</span></h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="p-6 rounded-lg border border-accent" data-aos="fade-up" data-aos-delay="100">
+                        <h3 class="font-bold text-lg mb-2">Freedom</h3>
+                        <p class="opacity-80 text-sm">Championing digital rights and privacy in an increasingly controlled world.</p>
+                    </div>
+                    <div class="p-6 rounded-lg border border-accent" data-aos="fade-up" data-aos-delay="200">
+                        <h3 class="font-bold text-lg mb-2">Knowledge</h3>
+                        <p class="opacity-80 text-sm">Pursuing deep understanding of security to combat ignorance and apathy.</p>
+                    </div>
+                    <div class="p-6 rounded-lg border border-accent" data-aos="fade-up" data-aos-delay="300">
+                        <h3 class="font-bold text-lg mb-2">Ethics</h3>
+                        <p class="opacity-80 text-sm">Maintaining the highest standards in all our security practices.</p>
+                    </div>
+                    <div class="p-6 rounded-lg border border-accent" data-aos="fade-up" data-aos-delay="400">
+                        <h3 class="font-bold text-lg mb-2">Justice</h3>
+                        <p class="opacity-80 text-sm">Standing against digital crimes that threaten human dignity.</p>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <!-- Main Content -->
-        <main class="flex-grow">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <!-- Hero Section -->
-                <section class="text-center py-12" data-aos="fade-up">
-                    <h1 class="text-4xl font-bold text-white mb-4">Project Documentation</h1>
-                    <p class="text-xl text-obsidian-300 max-w-3xl mx-auto">
-                        Comprehensive guide for developers to integrate and use this project effectively.
-                    </p>
-                    <div class="mt-8 flex justify-center space-x-4">
-                        <a href="#getting-started" class="bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-md font-medium transition duration-150">Get Started</a>
-                        <a href="https://github.com/yourusername/yourrepo" target="_blank" class="border border-obsidian-600 hover:bg-obsidian-700 text-white px-6 py-3 rounded-md font-medium transition duration-150">
-                            <span class="flex items-center">
-                                <i data-feather="github" class="mr-2"></i> View on GitHub
-                            </span>
-                        </a>
-                    </div>
-                </section>
-
-                <!-- Getting Started -->
-                <section id="getting-started" class="py-12" data-aos="fade-up">
-                    <h2 class="text-2xl font-bold text-white mb-6">Getting Started</h2>
-                    <div class="bg-obsidian-800 rounded-lg p-6 mb-8">
-                        <h3 class="text-xl font-semibold text-white mb-4">Installation</h3>
-                        <div class="mb-4">
-                            <p class="text-obsidian-300 mb-2">Install via npm:</p>
-                            <pre class="text-obsidian-100"><code>npm install your-package</code></pre>
-                        </div>
-                        <div class="mb-4">
-                            <p class="text-obsidian-300 mb-2">Or via yarn:</p>
-                            <pre class="text-obsidian-100"><code>yarn add your-package</code></pre>
-                        </div>
-                        <div>
-                            <p class="text-obsidian-300 mb-2">Or include via CDN:</p>
-                            <pre class="text-obsidian-100"><code>&lt;script src="https://cdn.jsdelivr.net/npm/your-package@latest/dist/your-package.min.js"&gt;&lt;/script&gt;</code></pre>
-                        </div>
-                    </div>
-
-                    <div class="bg-obsidian-800 rounded-lg p-6">
-                        <h3 class="text-xl font-semibold text-white mb-4">Basic Usage</h3>
-                        <div class="mb-4">
-                            <p class="text-obsidian-300 mb-2">Import the package:</p>
-                            <pre class="text-obsidian-100"><code>import YourPackage from 'your-package';</code></pre>
-                        </div>
-                        <div>
-                            <p class="text-obsidian-300 mb-2">Initialize with default options:</p>
-                            <pre class="text-obsidian-100"><code>const instance = new YourPackage({
-    // options here
-});</code></pre>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- API Reference -->
-                <section id="api-reference" class="py-12" data-aos="fade-up">
-                    <h2 class="text-2xl font-bold text-white mb-6">API Reference</h2>
-                    <div class="bg-obsidian-800 rounded-lg p-6 mb-8">
-                        <h3 class="text-xl font-semibold text-white mb-4">Methods</h3>
-                        <div class="space-y-6">
-                            <div>
-                                <h4 class="text-lg font-medium text-white mb-2">.init(config)</h4>
-                                <p class="text-obsidian-300 mb-2">Initializes the package with the given configuration.</p>
-                                <div class="mb-2">
-                                    <span class="inline-block bg-obsidian-700 rounded px-2 py-1 text-xs font-semibold text-white mr-2">Parameters</span>
-                                    <span class="text-obsidian-300">config: Object - Configuration object</span>
-                                </div>
-                                <pre class="text-obsidian-100"><code>instance.init({
-    option1: true,
-    option2: 'value'
-});</code></pre>
-                            </div>
-                            <div>
-                                <h4 class="text-lg font-medium text-white mb-2">.destroy()</h4>
-                                <p class="text-obsidian-300 mb-2">Cleans up all event listeners and DOM modifications.</p>
-                                <pre class="text-obsidian-100"><code>instance.destroy();</code></pre>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-obsidian-800 rounded-lg p-6">
-                        <h3 class="text-xl font-semibold text-white mb-4">Options</h3>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-obsidian-600">
-                                <thead class="bg-obsidian-700">
-                                    <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Option</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Type</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Default</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Description</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-obsidian-800 divide-y divide-obsidian-700">
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">option1</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-obsidian-300">Boolean</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-obsidian-300">true</td>
-                                        <td class="px-6 py-4 text-sm text-obsidian-300">Enables feature X</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">option2</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-obsidian-300">String</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-obsidian-300">'default'</td>
-                                        <td class="px-6 py-4 text-sm text-obsidian-300">Sets the mode for feature Y</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Examples -->
-                <section id="examples" class="py-12" data-aos="fade-up">
-                    <h2 class="text-2xl font-bold text-white mb-6">Examples</h2>
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-obsidian-800 rounded-lg p-6">
-                            <h3 class="text-xl font-semibold text-white mb-4">Basic Example</h3>
-                            <p class="text-obsidian-300 mb-4">A simple implementation with default options.</p>
-                            <pre class="text-obsidian-100"><code>const instance = new YourPackage();
-instance.init();</code></pre>
-                        </div>
-                        <div class="bg-obsidian-800 rounded-lg p-6">
-                            <h3 class="text-xl font-semibold text-white mb-4">Advanced Example</h3>
-                            <p class="text-obsidian-300 mb-4">Custom configuration with event listeners.</p>
-                            <pre class="text-obsidian-100"><code>const instance = new YourPackage({
-    option1: false,
-    option2: 'custom'
-});
-
-instance.on('event', (data) => {
-    console.log('Event triggered:', data);
-});</code></pre>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- FAQ -->
-                <section id="faq" class="py-12" data-aos="fade-up">
-                    <h2 class="text-2xl font-bold text-white mb-6">Frequently Asked Questions</h2>
-                    <div class="space-y-4">
-                        <div class="bg-obsidian-800 rounded-lg p-6">
-                            <h3 class="text-lg font-semibold text-white">How do I contribute to this project?</h3>
-                            <p class="text-obsidian-300 mt-2">Fork the repository on GitHub, make your changes, and submit a pull request. Make sure to follow the contribution guidelines.</p>
-                        </div>
-                        <div class="bg-obsidian-800 rounded-lg p-6">
-                            <h3 class="text-lg font-semibold text-white">Is this project production ready?</h3>
-                            <p class="text-obsidian-300 mt-2">Yes, the project is stable and used in production by many companies. However, always test in your specific environment.</p>
-                        </div>
-                        <div class="bg-obsidian-800 rounded-lg p-6">
-                            <h3 class="text-lg font-semibold text-white">How can I get support?</h3>
-                            <p class="text-obsidian-300 mt-2">Open an issue on GitHub or join our community Discord server for real-time support.</p>
-                        </div>
-                    </div>
-                </section>
+        </section>
+        <section id="join" class="py-20">
+            <div class="max-content text-center">
+                <div data-aos="zoom-in">
+                    <h2 class="text-4xl font-bold mb-6">JOIN THE <span class="gradient-text">FORCE</span></h2>
+                    <p class="text-xl mb-8 max-w-2xl mx-auto opacity-90">Become part of a learning community striving for a deeper understanding of our digital world.</p>
+                    <a href="https://github.com/NemesisCyberForce" target="_blank" class="bg-highlight hover:bg-opacity-90 text-white px-8 py-4 rounded-lg font-medium text-lg transition">Get Started</a>
+                </div>
             </div>
-        </main>
-
-        <!-- Footer -->
-        <footer class="bg-obsidian-800 border-t border-obsidian-700 py-8">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col md:flex-row justify-between items-center">
-                    <div class="mb-4 md:mb-0">
-                        <p class="text-obsidian-300">&copy; 2008- 2023 Volkan Sah. All rights reserved.</p>
+        </section>
+        <footer class="bg-primary border-t border-accent py-12">
+            <div class="max-content">
+                <div class="grid md:grid-cols-4 gap-8">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <i data-feather="shield" class="text-highlight"></i>
+                            <span class="text-xl font-bold">NEMESIS CYBER FORCE</span>
+                        </div>
+                        <p class="opacity-80 text-sm">Guardian - Vengeance Technologie - Retribution Security - Cyber Reprisal</p>
                     </div>
-                    <div class="flex space-x-6">
-                        <a href="https://github.com/volkansah" target="_blank" class="text-obsidian-300 hover:text-white">
-                            <i data-feather="github"></i>
-                        </a>
-                        <a href="https://twitter.com/yourusername" target="_blank" class="text-obsidian-300 hover:text-white">
-                            <i data-feather="twitter"></i>
-                        </a>
-                        <a href="https://discord.gg/yourinvite" target="_blank" class="text-obsidian-300 hover:text-white">
-                            <i data-feather="message-circle"></i>
-                        </a>
+                    <div>
+                        <h4 class="font-bold mb-4">Links</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#home" class="opacity-80 hover:text-highlight transition text-sm">to top</a></li>
+                        </ul>
                     </div>
+                    <div>
+                        <h4 class="font-bold mb-4">Connect</h4>
+                        <ul class="space-y-2">
+                            <li><a href="https://github.com/NemesisCyberForce" target="_blank" class="opacity-80 hover:text-highlight transition text-sm">GitHub</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-4">Legal</h4>
+                        <p class="opacity-80 text-sm">
+                            We **only** publish Blue Team/White Hat repos. All research must be conducted **only on systems with explicit, verifiable authorization**. We categorically reject illegal activity.
+                        </p>
+                    </div>
+                </div>
+                <div class="border-t border-accent mt-12 pt-8 text-center opacity-70 text-sm">
+                    <p>&copy; 2025 Nemesis Cyber Force. All rights reserved.</p>
                 </div>
             </div>
         </footer>
     </div>
-          </div>
-
     <script>
-
-           // Show content only if JavaScript is enabled
-        document.getElementById('main-content').classList.remove('hidden_main');
-        
-        // Initialize AOS
         AOS.init({
             duration: 800,
             once: true
         });
-
-        // Initialize feather icons
         feather.replace();
-
-        // Theme toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-        const currentTheme = localStorage.getItem('theme');
-
-        if (currentTheme === 'light' || (!currentTheme && !prefersDarkScheme.matches)) {
-            document.documentElement.classList.remove('dark');
-            themeToggle.innerHTML = feather.icons['sun'].toSvg();
-        } else {
-            document.documentElement.classList.add('dark');
-            themeToggle.innerHTML = feather.icons['moon'].toSvg();
-        }
-
-        themeToggle.addEventListener('click', function() {
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-                themeToggle.innerHTML = feather.icons['sun'].toSvg();
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-                themeToggle.innerHTML = feather.icons['moon'].toSvg();
-            }
-        });
-
-        // Mobile menu toggle (you would need to implement this)
-        // const mobileMenuButton = document.getElementById('mobile-menu-button');
-        // const mobileMenu = document.getElementById('mobile-menu');
-        // mobileMenuButton.addEventListener('click', function() {
-        //     mobileMenu.classList.toggle('hidden');
-        // });
     </script>
 </body>
 </html>
